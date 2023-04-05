@@ -1,0 +1,183 @@
+## a. 필요 기능
+
+- 로그인, 로그아웃, 회원가입
+    - Django 로그인 기능을 사용합니다.
+        - Django에서 제공하는 로그인 기능을 사용할 경우 Model을 작성하지 않고 form을 사용하는 것만으로도 로그인 기능을 만들 수 있습니다.
+    - 코드 예시
+        
+        ```python
+        # form
+        class SignupForm(UserCreationForm):
+            class Meta:
+                model = User
+                fields = ['username', 'email']
+        ```
+        
+        ```python
+        #view 
+        """
+        장고에서 제공하는 기능을 최대한 사용해 구현해봅시다.
+        아래 from ... import ... 구문이 힌트입니다. 
+        지금은 해당 함수가 어떻게 구현되어있는지 전부다 이해 할 수는 없겠지만 
+        지금까지 공부한 내용으로 이해할 수 있는 부분이 있을겁니다.
+        모르는 부분이 있다면 지금입니다. 공부할 타이밍!
+        """
+        from django.contrib.auth import login, logout
+        from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+        from django.shortcuts import render, redirect
+        
+        def signup(request):
+           # 회원 가입 view
+        
+        def user_login(request):
+            # 로그인 view
+        
+        def user_logout(request):
+            # 로그아웃 view
+        ```
+        
+- 상품 등록
+    - 코드번호와 상품의 종류 사이즈가 들어갑니다.
+    - 코드 예시
+        
+        ```python
+        # model
+        class Product(models.Model):
+            """
+            상품 모델입니다.
+            상품 코드, 상품 이름, 상품 설명, 상품 가격, 사이즈 필드를 가집니다.
+            """
+            code = 
+            name = 
+            description = 
+            price = 
+            sizes = (
+                ('S', 'Small'),
+                ('M', 'Medium'),
+                ('L', 'Large'),
+                ('F', 'Free'),
+            )
+            size = models.CharField(choices=sizes, max_length=1)
+        		"""
+        		choices 매개변수는 Django 모델 필드에서 사용하는 매개변수 중 하나로 
+        		해당 필드에서 선택 가능한 옵션을 지정하는 역할을 합니다. 
+        		변수를 통해 튜플 리스트를 받으면 첫번째 요소는 실제 DB에 저장되는 값이 되고,
+        		두번째 요소는 사용자가 볼 수 있는 레이블(옵션의 이름)이 됩니다.
+        		"""
+        
+            def __str__(self):
+                return self.code
+        
+            def save(self, *args, **kwargs):
+                # 생성될 때 stock quantity를 0으로 초기화 로직
+        ```
+        
+        ```python
+        # form
+        class ProductForm(forms.ModelForm):
+            class Meta:
+                model = Product
+                fields = ['name', 'code', 'description', 'price', 'size']
+        ```
+        
+        ```python
+        # view
+        @login_required
+        def product_list(request):
+            # 등록 된 상품의 리스트를 볼 수 있는 view
+        
+        @login_required
+        def product_create(request):
+            # 상품 등록 view
+        ```
+        
+- 입고
+    - 코드번호와 수량 입력으로 입고수량을 변화 시킬 수 있어야합니다.
+    - 코드 예시
+        
+        ```python
+        # model
+        class Inbound(models.Model):
+            """
+        		입고 모델입니다.
+        		상품, 수량, 입고 날짜, 금액 필드를 작성합니다.
+        		"""
+        ```
+        
+        ```python
+        # form
+        class InboundForm(forms.ModelForm):
+        		"""
+        		Django로 개발을 할때,
+        		Model과 Form을 사용하지 않으면 Django를 사용하는 의미가 없다고 말할 정도로 
+        		Model과 Form은 Django의 핵심 기능 입니다. 
+        		Form의 사용방법을 익혀 봅시다.
+        		"""
+        ```
+        
+        ```python
+        # view
+        @login_required
+        @transaction.atomic
+        def inbound_create(request):
+            # 상품 입고 view
+            # 입고 기록 생성
+            
+        		# 입고 수량 조정
+        ```
+        
+- 출고
+    - 코드번호와 수량 입력으로 출고수량을 변화 시킬 수 있어야합니다. 수량이 부족한 경우에는 출고를 할 수 없는 예외처리가 되어있어야 합니다.
+    - 코드 예시
+        
+        ```python
+        # model
+        class Outbound(models.Model):
+        		"""
+        		출고 모델입니다.
+        		상품, 수량, 입고 날짜, 금액 필드를 작성합니다.
+        		"""
+        ```
+        
+        ```python
+        # form
+        class OutboundForm(forms.ModelForm):
+        ```
+        
+        ```python
+        @login_required
+        def outbound_create(request, product_id):
+        		# 상품 출고 view
+            # 출고 기록 생성
+            
+        		# 재고 수량 조정
+        ```
+        
+- 입/출고 합산기능
+    - 입고 + 출고 합해서 총 수량을 표시해주어야 합니다.
+    - 코드 예시
+        
+        ```python
+        # model
+        class Invetory(models.Model):
+        	"""
+        	창고의 제품과 수량 정보를 담는 모델입니다.
+        	상품, 수량 필드를 작성합니다.
+        	작성한 Product 모델을 OneToOne 관계로 작성합시다.
+        	"""
+        ```
+        
+        ```python
+        # view
+        @login_required
+        def inventory(request):
+        	"""
+        	inbound_create, outbound_create view에서 만들어진 데이터를 합산합니다.
+        	Django ORM을 통하여 총 수량, 가격등을 계산할 수 있습니다.
+        	"""
+        	# 총 입고 수량, 가격 계산
+        
+        	# 총 출고 수량, 가격 계산
+        ```
+        
+- 디렉토리 구성 참고
