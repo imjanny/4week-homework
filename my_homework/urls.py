@@ -19,5 +19,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('users.urls')), # users>urls.py에서 관리할거야
+    path('', include('product.urls')),
+    path('', include('users.urls')),# users>urls.py에서 관리할거야
 ]
