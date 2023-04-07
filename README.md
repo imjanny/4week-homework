@@ -12,6 +12,8 @@
 ## 모델 구성
 * ERD 사이트
 
+[ERD보기](https://velog.io/@wogns0808/%EA%B0%9C%EC%9D%B8%EA%B3%BC%EC%A0%9C-ERD)
+
 
 ## 화면구성
 * 로그인 페이지
