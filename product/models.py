@@ -26,3 +26,25 @@ class Product(models.Model):
         if not self.pk:  # 새로운 상품이 생성될 때
             self.stock_quantity = 0  # stock_quantity를 0으로 초기화
         super().save(*args, **kwargs)
+
+
+class Inbound(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.product.stock_quantity += self.quantity - self.pk if self.pk else self.quantity
+        super().save(*args, **kwargs)
+
+
+
+
+class Outbound(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.product.stock_quantity -= self.quantity
+        super().save(*args, **kwargs)

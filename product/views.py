@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from .forms import ProductForm
-from .models import Product
+from .forms import InboundForm, ProductForm
+from .models import Outbound, Product
 
 def home(request):
     if request.user.is_authenticated:
@@ -47,3 +47,43 @@ def delete_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
     return redirect('product-list')
+
+@login_required
+def inbound(request):
+    if request.method == 'POST':
+        form = InboundForm(request.POST)
+        if form.is_valid():
+            inbound = form.save(commit=False)
+            inbound.product.stock_quantity += form.cleaned_data['quantity']
+            inbound.product.save()
+            inbound.save()
+            return redirect('product-list')
+    else:
+        form = InboundForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'product/inbound.html', context)
+
+
+@login_required
+def outbound(request):
+    if request.method == 'POST':
+        form = InboundForm(request.POST)
+        if form.is_valid():
+            product = form.cleaned_data['product']
+            quantity = form.cleaned_data['quantity']
+            stock_quantity = product.stock_quantity - quantity
+            if stock_quantity < 0:
+                stock_quantity = 0
+            product.stock_quantity = stock_quantity
+            product.save()
+            Outbound.objects.create(product=product, quantity=quantity)
+            return redirect('product-list')
+    else:
+        form = InboundForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'product/outbound.html', context)
+
