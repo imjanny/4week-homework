@@ -4,12 +4,15 @@ from django.contrib.auth.views import LoginView
 from .forms import InboundForm, ProductForm
 from .models import Outbound, Product
 
+#홈으로 사용할기능 홈으로 가기위한 함수
 def home(request):
     if request.user.is_authenticated:
         return redirect('product-list')
     else:
-        return redirect('/log_in')
+        return redirect('/log_in') 
+    
 
+#재고 리스트 함수
 @login_required
 def product_list_view(request):
     products = Product.objects.all()
@@ -18,10 +21,11 @@ def product_list_view(request):
     }
     return render(request, 'product/product-list.html', context)
 
+# 재품생성하수
 @login_required
 def create_product(request):
     form = ProductForm(request.POST or None)
-    if form.is_valid():
+    if form.is_valid():#폼에저장될 데이터가 폼에 입력되기 적당한지 판별하는 함수
         form.save()
         return redirect('product-list')
     context = {
@@ -29,6 +33,7 @@ def create_product(request):
     }
     return render(request, 'product/product.html', context)
 
+#제품 데이터를 수정하는 함수
 @login_required
 def update_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -42,12 +47,15 @@ def update_product(request, pk):
     }
     return render(request, 'product/product.html', context)
 
+#제품 데이터 삭제 함수
 @login_required
 def delete_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
     return redirect('product-list')
 
+
+#제품을 입고하는 함수
 @login_required
 def inbound(request):
     if request.method == 'POST':
@@ -66,6 +74,8 @@ def inbound(request):
     return render(request, 'product/inbound.html', context)
 
 
+
+#제품을 출고하는 함수
 @login_required
 def outbound(request):
     if request.method == 'POST':
