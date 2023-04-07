@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>제품 리스트</h1>
+  <p><a href="{% url 'inbound' %}">입고 등록하기</a></p>
+  <p><a href="{% url 'outbound' %}">출고 등록하기</a></p>
+  {% if products %}
+    <table style="width:100%">
+      <thead>
+        <tr>
+          <th style="width:10%">제품 코드</th>
+          <th style="width:20%">제품명</th>
+          <th style="width:20%">제품 수량</th>
+          <th style="width:20%">가격</th>
+          <th style="width:15%">사이즈</th>
+          <th style="width:15%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+          <tr>
+            <td>{{ product.code }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.stock_quantity }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.get_size_display }}</td>
+            <td>
+              <a href="{% url 'product-update' product.pk %}">수정</a>
+              <form action="{% url 'product-delete' product.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit">삭제</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>제품을 찾을 수 없음.</p>
+  {% endif %}
+
+  <p><a href="{% url 'product-create' %}">새로운 제품 등록하기</a></p>
+{% endblock %}
