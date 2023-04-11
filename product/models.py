@@ -12,8 +12,10 @@ class Product(models.Model):
         ('M', 'Medium'),
         ('L', 'Large'),
         ('F', 'Free'),
+        
     )
     size = models.CharField(choices=sizes, max_length=1)
+    
     
     def __str__(self):
         return str(self.code)
